@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
@@ -11,23 +12,60 @@
     tools:context="uk.co.joelwalker.bebop_follow_me.MainActivity">
 
     <LinearLayout
-        android:orientation="vertical"
+        android:id="@+id/content_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:weightSum="1"
         android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true"
-        android:id="@+id/content_view">
+        android:layout_alignParentStart="true">
 
         <TextView
-            android:text="Mobile GPS: "
+            android:id="@+id/textView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/mob_gps_text" />
+            android:layout_weight="0.13"
+            android:text="Follow" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/floatingActionButton"
+            android:layout_width="142dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_weight="0.29"
+            android:adjustViewBounds="false"
+            app:backgroundTint="@color/colorPrimaryDark"
+            app:elevation="0dp"
+            app:fabSize="normal"
+            app:rippleColor="@color/colorPrimary"
+            app:srcCompat="@drawable/ic_navigation" />
 
         <TextView
-            android:text="Drone GPS: "
+            android:id="@+id/drone_gps_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/drone_gps_text" />
+            android:layout_weight="0.09"
+            android:text="Drone GPS: " />
+
+        <TextView
+            android:id="@+id/mob_gps_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.10"
+            android:text="Mobile GPS: " />
+
+        <SeekBar
+            android:id="@+id/seekBar3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.13" />
+
+        <SeekBar
+            android:id="@+id/seekBar2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.13" />
+
     </LinearLayout>
+
 </RelativeLayout>

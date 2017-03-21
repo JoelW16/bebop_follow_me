@@ -1,3 +1,7 @@
 <resources>
-    <string name="app_name">bebop_follow_me</string>
+    <string name="app_name">Bebop Follow</string>
+    <string name="title_activity_start">Bebop Tour Guide</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Drone Tour</string>
+    <string name="title_notifications">Create Tour</string>
 </resources>
