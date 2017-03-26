@@ -7,5 +7,5 @@ import org.json.JSONObject;
  */
 
 public interface APIResponse {
-    void apiResponse(boolean connected, JSONObject res);
+    void apiResponse(JSONObject res);
 }

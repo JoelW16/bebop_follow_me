@@ -22,19 +22,22 @@ public class APIPut extends AsyncTask<JSONObject, Void, String> {
 
     final String TAG = "API Put";
 
+    private String apiAdd;
+
     Boolean connected = false;
 
     Connection connection;
 
-    APIPut(Context context, View mainView, APIResponse apiResponse) {
+    APIPut(Context context, View mainView, APIResponse apiResponse, String apiAdd) {
         connection = new Connection(context, mainView);
         responce = apiResponse;
+        this.apiAdd = apiAdd;
     }
 
     @Override
     protected String doInBackground(JSONObject... params) {
         JSONObject json = params[0];
-        return connection.postRequest(Constants.SERVER_URL + Constants.Android_API, json);
+        return connection.postRequest(Constants.SERVER_URL + apiAdd, json);
     }
 
     @Override
@@ -43,13 +46,7 @@ public class APIPut extends AsyncTask<JSONObject, Void, String> {
 
         try {
             JSONObject jsonRes = new JSONObject(s);
-
-            if(jsonRes.has("connected")){
-                connected = (boolean) jsonRes.get("connected");
-            }
-
-            Log.i(TAG, "Status: " + connected);
-            responce.apiResponse(connected, jsonRes);
+            responce.apiResponse(jsonRes);
         } catch (JSONException e) {
             e.printStackTrace();
         }

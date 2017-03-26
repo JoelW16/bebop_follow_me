@@ -1,14 +1,15 @@
-package layout;
+package uk.co.joelwalker.bebop_follow_me.Fragments;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,18 +17,22 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import uk.co.joelwalker.bebop_follow_me.*;
+import org.json.JSONObject;
+
 import uk.co.joelwalker.bebop_follow_me.API.APIManager;
+import uk.co.joelwalker.bebop_follow_me.API.APIResponse;
+import uk.co.joelwalker.bebop_follow_me.R;
 
 
-public class TourFragment extends Fragment implements LocationListener {
+public class TourFragment extends Fragment implements LocationListener, APIResponse {
 
     private FloatingActionButton gps_fab;
     private APIManager api;
 
     private View mainView;
-    private TextView connection_txt, mobile_gps;
+    private TextView connection_txt, mobile_gps, currentPos_txt;
 
+    private boolean connected = false;
 
     public final int MY_PERMISSIONS_REQUEST_FINE_LOCATION = 0;
 
@@ -38,10 +43,12 @@ public class TourFragment extends Fragment implements LocationListener {
     }
 
 
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
+        Log.d("Tour", "On Create View");
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_tour, container, false);
 
@@ -49,8 +56,9 @@ public class TourFragment extends Fragment implements LocationListener {
 
         connection_txt = (TextView) view.findViewById(R.id.connection_txt);
         mobile_gps = (TextView) view.findViewById(R.id.mob_gps_txt);
+        currentPos_txt = (TextView) view.findViewById(R.id.pos_txt);
 
-        api = new APIManager(getActivity(), mainView);
+        api = new APIManager(getActivity(), mainView, this);
 
 
         gps_fab = (FloatingActionButton) view.findViewById(R.id.gps_fab);
@@ -58,12 +66,13 @@ public class TourFragment extends Fragment implements LocationListener {
         gps_fab.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 boolean b = api.getConnected();
-                Log.d("MAIN FAB",  "connected"+ b);
                 if(!b){
                     api.connectServer();
                 }else{
+                    connected = false;
                     api.disconnectServer();
                 }
+
             }
         });
 
@@ -87,13 +96,18 @@ public class TourFragment extends Fragment implements LocationListener {
     }
 
 
-
     //GPS Stuff
     @Override
     public void onLocationChanged(Location location) {
-        if(api.getConnected()){
+        if(connected){
             mobile_gps.setText("Mobile GPS: " + location.getLatitude() + " "+ location.getLongitude() + " " + location.getAccuracy());
-            api.sendGPS(location.getLongitude(), location.getLatitude(), location.getAccuracy());
+
+            if(location.getAccuracy() <= 3){
+                api.sendGPS(location.getLongitude(), location.getLatitude(), location.getAccuracy());
+                mobile_gps.setTextColor(Color.GREEN);
+            }else{
+                mobile_gps.setTextColor(Color.RED);
+            }
         }else{
             mobile_gps.setText("Mobile GPS: - - ");
         }
@@ -112,5 +126,25 @@ public class TourFragment extends Fragment implements LocationListener {
     @Override
     public void onProviderDisabled(String s) {
 
+    }
+
+    @Override
+    public void apiResponse(JSONObject res) {
+        if(api.getConnected()){
+            connection_txt.setText("Status: Connected");
+            connected= true;
+
+        }else{
+            connected = false;
+            connection_txt.setText("Status: disconnected");
+        }
+
+
+//        try {
+//            String pos = res.getString("pos");
+//            currentPos_txt.setText("Current Node: " + pos);
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
     }
 }

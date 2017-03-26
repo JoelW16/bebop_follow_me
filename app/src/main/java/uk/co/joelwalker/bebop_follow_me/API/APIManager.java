@@ -3,11 +3,16 @@ package uk.co.joelwalker.bebop_follow_me.API;
 import android.content.Context;
 import android.util.Log;
 import android.view.View;
-import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
+
+import uk.co.joelwalker.bebop_follow_me.Point;
+import uk.co.joelwalker.bebop_follow_me.server.Constants;
 
 /**
  * Created by Joel on 22/03/2017.
@@ -19,14 +24,15 @@ public class APIManager implements APIResponse {
 
     private Context context;
     private View mainView;
-    private TextView statusTxt;
 
+    private APIResponse apires;
     private Boolean connected = false;
 
-    public APIManager(Context context, View mainView, TextView statusTxt){
+    public APIManager(Context context, View mainView, APIResponse apires){
         this.context = context;
         this.mainView = mainView;
-        this.statusTxt = statusTxt;
+
+        this.apires = apires;
     }
 
     public void connectServer(){
@@ -38,11 +44,11 @@ public class APIManager implements APIResponse {
             e.printStackTrace();
         }
 
-        APIPut put = new APIPut(context, mainView, this);
+        APIPut put = new APIPut(context, mainView, this, Constants.Android_API);
         put.execute(json);
     }
 
-    public void disconnectServer(){
+    public Boolean disconnectServer(){
         Log.d(TAG, "disconnect");
         JSONObject json = new JSONObject();
         try {
@@ -53,8 +59,16 @@ public class APIManager implements APIResponse {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        APIPut put = new APIPut(context, mainView, this);
-        put.execute(json);
+        APIPut put = new APIPut(context, mainView, this, Constants.Android_API);
+        String res = null;
+        try {
+            res =  put.execute(json).get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+        return res != null;
     }
 
     public void sendGPS(double longitude, double latitude, float accuracy){
@@ -68,11 +82,11 @@ public class APIManager implements APIResponse {
             e.printStackTrace();
         }
 
-        APIPut put = new APIPut(context, mainView, this);
+        APIPut put = new APIPut(context, mainView, this, Constants.Android_API);
         put.execute(json);
     }
 
-    public void sendTest(double longitude, double latitude, float accuracy){
+    public void sendPoint(double longitude, double latitude, float accuracy){
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("name", "Test Name");
@@ -94,7 +108,38 @@ public class APIManager implements APIResponse {
             e.printStackTrace();
         }
 
-        APIPut put = new APIPut(context, mainView, this);
+        APIPut put = new APIPut(context, mainView, this, Constants.Android_TOUR);
+        put.execute(jsonObjectMain);
+    }
+
+    public void sendPoints(ArrayList<Point> points){
+
+        JSONArray jsonArray = new JSONArray();
+        for (Point p :points){
+            JSONObject jsonObject = new JSONObject();
+            try {
+                jsonObject.put("locationRef", points.indexOf(p));
+                jsonObject.put("name", p.getName());
+                jsonObject.put("info", p.getInfo());
+                jsonObject.put("latitude", p.getLat());
+                jsonObject.put("longitude", p.getLng());
+                jsonObject.put("accuracy", p.getAccuracy());
+                jsonObject.put("poi", p.isPoi());
+
+                jsonArray.put(jsonObject);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        JSONObject jsonObjectMain= new JSONObject();
+        try {
+            jsonObjectMain.put("tour", jsonArray);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        APIPut put = new APIPut(context, mainView, this, Constants.Android_TOUR);
         put.execute(jsonObjectMain);
     }
 
@@ -104,13 +149,15 @@ public class APIManager implements APIResponse {
 
 
     @Override
-    public void apiResponse(boolean connected, JSONObject res) {
-        this.connected = connected;
-        if(connected){
-            statusTxt.setText("Status: Connected");
-        }else{
-            statusTxt.setText("Status: Disconnected");
-        }
+    public void apiResponse(JSONObject res) {
+        if(res.has("connected")){
+            try {
+                connected = (Boolean) res.get("connected");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
 
+        }
+        apires.apiResponse(res);
     }
 }

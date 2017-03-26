@@ -1,4 +1,4 @@
-package layout;
+package uk.co.joelwalker.bebop_follow_me.Fragments;
 
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
