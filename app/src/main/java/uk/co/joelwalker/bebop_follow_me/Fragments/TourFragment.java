@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import org.json.JSONObject;
@@ -28,6 +29,8 @@ public class TourFragment extends Fragment implements LocationListener, APIRespo
 
     private FloatingActionButton gps_fab;
     private APIManager api;
+
+    private Button btn_takeoff, btn_land, btn_emg;
 
     private View mainView;
     private TextView connection_txt, mobile_gps, currentPos_txt;
@@ -54,6 +57,10 @@ public class TourFragment extends Fragment implements LocationListener, APIRespo
 
         mainView = getActivity().findViewById(R.id.main_container);
 
+        btn_takeoff = (Button) view.findViewById(R.id.btn_takeoff);
+        btn_land = (Button) view.findViewById(R.id.btn_land);
+        btn_emg = (Button)  view.findViewById(R.id.btn_EMG);
+
         connection_txt = (TextView) view.findViewById(R.id.connection_txt);
         mobile_gps = (TextView) view.findViewById(R.id.mob_gps_txt);
         currentPos_txt = (TextView) view.findViewById(R.id.pos_txt);
@@ -75,6 +82,28 @@ public class TourFragment extends Fragment implements LocationListener, APIRespo
 
             }
         });
+
+        btn_takeoff.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                // Perform action on click
+                api.droneTakeoff();
+            }
+        });
+
+        btn_land.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                // Perform action on click
+                api.droneLand();
+            }
+        });
+
+        btn_emg.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                // Perform action on click
+                api.droneEmgLand();
+            }
+        });
+
 
         //Get permission to use GPS Data
         if (ContextCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_FINE_LOCATION)
@@ -102,7 +131,7 @@ public class TourFragment extends Fragment implements LocationListener, APIRespo
         if(connected){
             mobile_gps.setText("Mobile GPS: " + location.getLatitude() + " "+ location.getLongitude() + " " + location.getAccuracy());
 
-            if(location.getAccuracy() <= 3){
+            if(location.getAccuracy() <= 300){
                 api.sendGPS(location.getLongitude(), location.getLatitude(), location.getAccuracy());
                 mobile_gps.setTextColor(Color.GREEN);
             }else{

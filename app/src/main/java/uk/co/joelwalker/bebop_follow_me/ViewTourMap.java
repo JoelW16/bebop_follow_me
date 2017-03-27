@@ -125,6 +125,7 @@ public class ViewTourMap extends AppCompatActivity implements APIResponse, OnMap
 
     @Override
     public void apiResponse(JSONObject res) {
+        finish();
 
     }
 }

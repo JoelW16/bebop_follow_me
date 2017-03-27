@@ -48,6 +48,40 @@ public class APIManager implements APIResponse {
         put.execute(json);
     }
 
+
+    public void droneTakeoff(){
+        JSONObject json = new JSONObject();
+        try {
+            json.put("command", 1);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        APIPut put = new APIPut(context, mainView, this, Constants.Android_API);
+        put.execute(json);
+    }
+
+    public void droneLand(){
+        JSONObject json = new JSONObject();
+        try {
+            json.put("command", 2);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        APIPut put = new APIPut(context, mainView, this, Constants.Android_API);
+        put.execute(json);
+    }
+
+    public void droneEmgLand(){
+        JSONObject json = new JSONObject();
+        try {
+            json.put("command", 0);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        APIPut put = new APIPut(context, mainView, this, Constants.Android_API);
+        put.execute(json);
+    }
+
     public Boolean disconnectServer(){
         Log.d(TAG, "disconnect");
         JSONObject json = new JSONObject();
